@@ -1,0 +1,130 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: black;
+}
+
+/* Navbar */
+.nav {
+  text-align: center;
+}
+
+/* Home */
+.form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  padding: 40px;
+  transform: translate(-50%, -50%);
+  background: rgb(54, 52, 52);
+  box-sizing: border-box;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+}
+
+.form h1 {
+  margin: 0 0 30px;
+  padding: 0;
+  color: #fff;
+  text-align: center;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tab-element {
+  cursor: pointer;
+  font-size: 20px;
+  color: #03e9f4;
+  padding: 5px;
+}
+
+.active {
+  border-bottom: 2px solid white;
+}
+
+.form input {
+  width: 100%;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 30px;
+  border: none;
+  border-bottom: 1px solid #fff;
+  outline: none;
+  background: transparent;
+}
+
+.form button {
+  padding: 10px 20px;
+  color: #03e9f4;
+  font-size: 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: 0.5s;
+  letter-spacing: 4px;
+  margin-right: 20px;
+  background-color: transparent;
+}
+
+/* Game */
+.game {
+  display: grid;
+  grid-template-columns: repeat(10, 5fr);
+  grid-template-rows: repeat(10, 4fr);
+  column-gap: 0px;
+  row-gap: 0;
+  margin: 10px auto;
+  width: 50%;
+  background-color: rgb(53, 50, 50);
+  border: 1px solid black;
+}
+@media (max-width: 768px) {
+  .game {
+    width: 99%;
+  }
+  .box {
+    height: 8vh;
+  }
+}
+.box {
+  border: 0.25px solid lightgrey;
+  text-align: center;
+  display: flex;
+  height: 9vh;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+.box:hover {
+  background-color: rgb(95, 95, 95);
+}
+.box:active {
+  background-color: gray;
+}
+
+#ball3 {
+  position: absolute;
+  bottom: 0px;
+  /* animation: moveup 0.2s linear 1; */
+}
+
+#ball1 {
+  position: absolute;
+  left: 20%;
+  /* animation: moveright 0.2s linear 1; */
+}
+
+#ball2 {
+  position: absolute;
+  right: 12%;
+  /* animation: moveleft 0.2s linear 1; */
+}
