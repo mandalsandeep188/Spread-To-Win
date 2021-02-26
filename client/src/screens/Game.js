@@ -7,7 +7,7 @@ import { io } from "socket.io-client";
 
 let socket = io("http://localhost:5000");
 
-export default function Game() {
+export default function Game(props) {
   const [gameState, setGameState] = useState([
     ...Array(100).fill({ n: 0, p: 0 }),
   ]);
@@ -62,6 +62,7 @@ export default function Game() {
 
   return (
     <>
+      <h6>Game Code: {props.gameCode}</h6>
       <div
         style={{
           color: `${player === 1 ? "#ff5c5c" : "#5cabff"}`,

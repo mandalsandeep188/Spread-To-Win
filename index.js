@@ -14,12 +14,26 @@ const {
   isValidFor3,
 } = require("./game");
 
+const makeID = (length) => {
+  let text = "";
+  let possible =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (let i = 0; i < length; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+};
+
 let { gameState, player, step } = require("./game");
+
+let states = {};
+let clientRooms = {};
 
 io.on("connection", (client) => {
   console.log("Connected");
 
-  client.emit("init", { data: "hello from server" });
+  client.on("newGame", newGame);
 
   client.on("gameState", (data) => {
     initializeGame(data);
@@ -38,6 +52,19 @@ io.on("connection", (client) => {
     step.current = data.step.current;
     client.emit("playerChange", data);
   });
+
+  const newGame = () => {
+    let roomName = makeID(5);
+
+    clientRooms[client.id] = roomName;
+    client.emit("gameCode", roomName);
+
+    // state[roomName] = "THINK";
+
+    // client.join(roomName);
+    // client.number = 1;
+    // client.emit("init", 1);
+  };
 
   const increaseBalls = (index, arr) => {
     let n = undefined;
