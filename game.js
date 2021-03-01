@@ -1,5 +1,3 @@
-let gameState, player, step;
-
 const isValid = (i, index, n) => {
   if (n === 1) {
     if (i === 0) {
@@ -32,8 +30,8 @@ const isValid = (i, index, n) => {
 const isValidFor3 = (index) => {
   return (
     index - 1 >= 0 &&
-    index + 1 < gameState.length &&
-    index + 10 < gameState.length &&
+    index + 1 < 100 &&
+    index + 10 < 100 &&
     index - 10 >= 0 &&
     index % 10 !== 0 &&
     index % 10 !== 9
@@ -44,16 +42,16 @@ const isNotValidFor2 = (index) => {
   return index === 0 || index === 9 || index === 90 || index === 99;
 };
 
-const initializeGame = (data) => {
-  gameState = data.gameState;
-  player = data.player;
-  step = data.step;
+const initializeGame = () => {
+  let gameState = {
+    grid: [...Array(100).fill({ n: 0, p: 0 })],
+    player: 1,
+    step: 0,
+  };
+  return gameState;
 };
 
 module.exports = {
-  gameState,
-  player,
-  step,
   isValid,
   isNotValidFor2,
   isValidFor3,

@@ -3,22 +3,18 @@ import "../App.css";
 import Ball from "../components/Ball";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { io } from "socket.io-client";
+import { socket } from "./Home";
 
-let socket = io("http://localhost:5000");
-
-export default function Game() {
-  const [gameState, setGameState] = useState([
-    ...Array(100).fill({ n: 0, p: 0 }),
-  ]);
+export default function Game(props) {
+  const [gameState, setGameState] = useState(props.gameData.gameState.grid);
   const [player, setPlayer] = useState(1);
-  const step = useRef(0);
+  const step = useRef(props.gameData.gameState.player);
+  const [playerId, setPlayerId] = useState(props.gameData.id);
 
   const increaseBalls = (index, arr = [...gameState]) => {
-    socket.emit("increaseBalls", { index, arr });
-
-    socket.on("setGameState", (arr) => {
-      setGameState(arr);
+    socket.emit("increaseBalls", {
+      index,
+      arr,
     });
   };
 
@@ -35,33 +31,39 @@ export default function Game() {
   }, [player]);
 
   useEffect(() => {
-    console.log("Hello World");
-    socket.on("init", (data) => {
-      console.log(data);
-      socket.emit("gameState", { gameState, player, step });
-    });
     socket.on("playerChange", (data) => {
       setPlayer(data.player);
       step.current = data.step.current;
     });
-    socket.on("win", (p) => {
-      toast.success(`Player ${p} won`, {
-        onClose: () => {
-          socket.emit("gameState", {
-            gameState: [...Array(100).fill({ n: 0, p: 0 })],
-            player: 1,
-            step: { current: 0 },
-          });
-          setGameState([...Array(100).fill({ n: 0, p: 0 })]);
-          setPlayer(1);
-          step.current = 0;
-        },
-      });
+    socket.once("win", (p) => {
+      setPlayerId(0);
+      toast.success(
+        `Player ${p} won, ${
+          props.offline
+            ? ""
+            : playerId === p
+            ? "Congratulation!"
+            : "Played Well!"
+        }`,
+        {
+          onClose: () => {
+            window.location.reload();
+          },
+        }
+      );
+    });
+    socket.on("setGameState", (arr) => {
+      setGameState(arr);
     });
   }, []);
 
   return (
     <>
+      {!props.offline ? (
+        <h4 style={{ color: "white", textAlign: "center" }}>
+          Game Code (Share this to play online): {props.gameData.gameCode}
+        </h4>
+      ) : undefined}
       <div
         style={{
           color: `${player === 1 ? "#ff5c5c" : "#5cabff"}`,
@@ -70,7 +72,10 @@ export default function Game() {
           fontSize: "20px",
           fontWeight: "bold",
         }}
-      >{`Player ${player} turn`}</div>
+      >
+        {`Player ${player} turn`}{" "}
+        {props.offline ? "" : player === playerId ? "(Make your move)" : ""}
+      </div>
       <div className="game">
         {gameState.map((state, index) => (
           <div
@@ -78,7 +83,10 @@ export default function Game() {
             key={index}
             title={index}
             onClick={() => {
-              if (state.p === 0 || state.p === player) {
+              if (
+                (state.p === 0 || state.p === player) &&
+                (props.offline || playerId === player)
+              ) {
                 increaseBalls(index);
                 socket.emit("played", {
                   step: { current: step.current + 1 },
