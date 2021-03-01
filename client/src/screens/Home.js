@@ -1,37 +1,52 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import "../App.css";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { io } from "socket.io-client";
 import Game from "./Game";
+import { toast } from "react-toastify";
 
-let socket = io("http://localhost:5000");
+export let socket = io("http://localhost:5000");
 
 export default function Home() {
   const [game, setGame] = useState(0);
   const [showGame, setShowGame] = useState(false);
+  const [gameData, setGameData] = useState(null);
   const [gameCode, setGameCode] = useState(null);
+  const [offline, setOffline] = useState(false);
 
   const newGame = () => {
     socket.emit("newGame");
-
-    socket.on("gameCode", (data) => {
-      setGameCode(data);
-      console.log(data);
-    });
   };
 
   useEffect(() => {
-    if (gameCode) {
+    if (gameData) {
       setShowGame(true);
     }
-  }, [gameCode]);
+  }, [gameData]);
 
-  const joinGame = () => {};
+  useEffect(() => {
+    socket.on("unknownCode", () => toast.error("Unknown Code"));
+    socket.on("tooManyPlyers", () =>
+      toast.error("Already 2 players in the room")
+    );
+    socket.once("newGame", (data) => {
+      setGameData(data);
+      toast.info("New game started");
+    });
+    socket.once("joinGame", (data) => {
+      setGameData(data);
+      toast.info("Player 2 joined");
+    });
+  }, []);
+
+  const joinGame = () => {
+    socket.emit("joinGame", gameCode);
+  };
+
   return (
     <>
       {showGame ? (
-        <Game gameCode={gameCode} />
+        <Game gameData={gameData} offline={offline} />
       ) : (
         <>
           <div className="form">
@@ -51,14 +66,45 @@ export default function Home() {
               </div>
             </div>
             {game === 0 ? (
-              <form>
-                <input type="text" placeholder="Name"></input>
-                <button onClick={newGame}>Start</button>
-              </form>
+              <>
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <input
+                    type="checkbox"
+                    style={{ width: "auto" }}
+                    onChange={() => setOffline(true)}
+                  />
+                  <h3
+                    style={{ color: "white", textAlign: "center", margin: "0" }}
+                  >
+                    Want to play locally?
+                  </h3>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    newGame();
+                  }}
+                >
+                  Start
+                </button>
+              </>
             ) : (
               <form>
-                <input type="text" placeholder="GameID"></input>
-                <button onClick={joinGame}>Join</button>
+                <input
+                  type="text"
+                  placeholder="GameID"
+                  onChange={(e) => {
+                    setGameCode(e.target.value);
+                  }}
+                ></input>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    joinGame();
+                  }}
+                >
+                  Join
+                </button>
               </form>
             )}
           </div>
