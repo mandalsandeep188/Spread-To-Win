@@ -1,4 +1,7 @@
-const server = require("http").createServer();
+const express = require("express");
+const app = express();
+const server = require("http").createServer(app);
+const PORT = process.env.PORT || 5000;
 
 const io = require("socket.io")(server, {
   cors: {
@@ -128,6 +131,15 @@ io.on("connection", (client) => {
   });
 });
 
-server.listen(5000, () => {
+//Production setup
+if (process.env.NODE_ENV == "production") {
+  app.use(express.static("client/build"));
+  const path = require("path");
+  app.get("/", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
+
+server.listen(PORT, () => {
   console.log("Server listening");
 });
