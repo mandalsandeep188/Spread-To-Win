@@ -9,7 +9,8 @@ export default function Game(props) {
   const [gameState, setGameState] = useState(props.gameData.gameState.grid);
   const [player, setPlayer] = useState(1);
   const step = useRef(props.gameData.gameState.player);
-  const [playerId, setPlayerId] = useState(props.gameData.id);
+  const [playerId, setPlayerId] = useState(0);
+  const audio = useRef(new Audio("audio.mp3"));
 
   const increaseBalls = (index, arr = [...gameState]) => {
     socket.emit("increaseBalls", {
@@ -31,12 +32,16 @@ export default function Game(props) {
   }, [player]);
 
   useEffect(() => {
+    socket.on("joinGame", () => {
+      setPlayerId(props.gameData.id);
+    });
+    if ((playerId === 0 && props.gameData.id === 2) || props.offline)
+      setPlayerId(2);
     socket.on("playerChange", (data) => {
       setPlayer(data.player);
       step.current = data.step.current;
     });
     socket.once("win", (p) => {
-      setPlayerId(0);
       toast.success(
         `Player ${p} won, ${
           props.offline
@@ -51,11 +56,16 @@ export default function Game(props) {
           },
         }
       );
+      setPlayerId(0);
     });
     socket.on("setGameState", (arr) => {
       setGameState(arr);
     });
   }, []);
+
+  useEffect(() => {
+    if (playerId !== 0) audio.current.play();
+  }, [gameState]);
 
   return (
     <>
@@ -81,7 +91,6 @@ export default function Game(props) {
           <div
             className="box"
             key={index}
-            title={index}
             onClick={() => {
               if (
                 (state.p === 0 || state.p === player) &&

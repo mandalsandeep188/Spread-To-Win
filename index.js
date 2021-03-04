@@ -99,7 +99,6 @@ io.on("connection", (client) => {
     }
     states[roomName] = { ...states[roomName], grid: arr };
     io.sockets.in(roomName).emit("setGameState", arr);
-    console.log(index, arr[index]);
     if (n) {
       if (isValid(index, index + 1, n)) increaseBalls(index + 1, arr);
       if (isValid(index, index - 1, n)) increaseBalls(index - 1, arr);

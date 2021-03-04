@@ -49,6 +49,7 @@ export default function Home() {
         <Game gameData={gameData} offline={offline} />
       ) : (
         <>
+          <img className="img" src="Gamelogo.png" alt="logo" />
           <div className="form">
             <h1>Spread to Win</h1>
             <div className="tabs">
