@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import Game from "./Game";
 import { toast } from "react-toastify";
 
-export let socket = io("http://localhost:5000");
+export let socket = io("https://sprreadtowin.herokuapp.com/");
 
 export default function Home() {
   const [game, setGame] = useState(0);
